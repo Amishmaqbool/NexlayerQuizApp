@@ -42,6 +42,50 @@ async function testConnection() {
     } else {
       console.log(`✅ Found ${options.length} answer options`);
     }
+
+    // Test quiz_sessions table
+    console.log('\n🧪 Testing quiz_sessions table structure...');
+    const { data: sessions, error: sessionsError } = await supabase
+      .from('quiz_sessions')
+      .select('*');
+    
+    if (sessionsError) {
+      console.error('❌ Quiz sessions error:', sessionsError);
+    } else {
+      console.log(`✅ Found ${sessions.length} quiz sessions`);
+    }
+
+    // Test inserting into quiz_sessions with the structure that QuizTaker now uses
+    console.log('\n🧪 Testing quiz_sessions insert with QuizTaker structure...');
+    
+    // Get a real quiz ID to use for testing
+    if (quizzes.length > 0) {
+      const quizTakerStructure = {
+        quiz_id: quizzes[0].id,
+        score: 8,
+        total_questions: 16,
+        completed_at: new Date().toISOString()
+      };
+      
+      const { data: insertData, error: insertError } = await supabase
+        .from('quiz_sessions')
+        .insert(quizTakerStructure)
+        .select();
+      
+      if (insertError) {
+        console.error('❌ QuizTaker structure insert test failed:', insertError);
+      } else {
+        console.log('✅ QuizTaker structure insert successful:', insertData);
+        
+        // Clean up the test data
+        await supabase
+          .from('quiz_sessions')
+          .delete()
+          .eq('id', insertData[0].id);
+        
+        console.log('✅ Test data cleaned up');
+      }
+    }
     
     console.log('\n🎉 Database connection successful!');
     

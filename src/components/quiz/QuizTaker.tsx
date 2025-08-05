@@ -144,15 +144,64 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
 
       // Try to save to database
       try {
-        await supabase.from('quiz_sessions').insert({
+        console.log('Attempting to save quiz session:', {
           quiz_id: quizId,
           score,
           total_questions: questions.length,
-          time_spent: timeSpent,
-          answers: selectedAnswers
+          completed_at: new Date().toISOString()
         });
+
+        // First, let's test the connection by checking if the table exists
+        const { data: testData, error: testError } = await supabase
+          .from('quiz_sessions')
+          .select('count', { count: 'exact', head: true });
+        
+        if (testError) {
+          console.error('Table access error:', testError);
+          throw new Error(`Cannot access quiz_sessions table: ${testError.message}`);
+        }
+
+        console.log('Table access successful, attempting insert...');
+
+        const insertData = {
+          quiz_id: quizId,
+          score,
+          total_questions: questions.length,
+          completed_at: new Date().toISOString()
+        };
+
+        const { data, error } = await supabase
+          .from('quiz_sessions')
+          .insert(insertData)
+          .select();
+        
+        if (error) {
+          console.error('Database insert error:', error);
+          console.error('Error details:', {
+            message: error.message,
+            details: error.details,
+            hint: error.hint,
+            code: error.code
+          });
+          toast({
+            title: "Database Error",
+            description: `Failed to save quiz session: ${error.message}`,
+            variant: "destructive",
+          });
+        } else {
+          console.log('Quiz session saved successfully to database:', data);
+          toast({
+            title: "Success",
+            description: "Quiz completed and saved successfully!",
+          });
+        }
       } catch (dbError) {
-        console.log('Could not save to database, but quiz completed successfully');
+        console.error('Could not save to database:', dbError);
+        toast({
+          title: "Database Connection Error",
+          description: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+          variant: "destructive",
+        });
       }
 
       onComplete(sessionData);
@@ -174,7 +223,7 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
 
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-  const allAnswered = questions.every(q => selectedAnswers[q.id]);
+  const allAnswered = questions.length > 0 && answeredQuestions.size === questions.length;
 
   if (loading) {
     return (

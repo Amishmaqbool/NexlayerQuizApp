@@ -1,7 +1,6 @@
 import { Brain, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import Logo from "../../../public/logo.webp"
 
 interface HeaderProps {
   onNavigate?: (section: string) => void;
@@ -21,7 +20,7 @@ export const Header = ({ onNavigate }: HeaderProps) => {
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
         <a href="/" className="flex items-center space-x-3">
-          <img src={Logo} alt="Nexlayer Logo" className="w-full h-8" />
+          <img src="/logo.webp" alt="Nexlayer Logo" className="w-40 h-8" />
         </a>
 
         {/* Desktop Navigation */}

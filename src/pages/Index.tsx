@@ -14,6 +14,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'list' | 'quiz' | 'results'>('dashboard');
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [sessionData, setSessionData] = useState<any>(null);
+  const [dashboardRefreshTrigger, setDashboardRefreshTrigger] = useState(0);
 
   const handleViewChange = (view: 'dashboard' | 'list' | 'quiz' | 'results', quizId?: string) => {
     setCurrentView(view);
@@ -25,6 +26,8 @@ const Index = () => {
   const handleQuizComplete = (data: any) => {
     setSessionData(data);
     setCurrentView('results');
+    // Trigger dashboard refresh when quiz is completed
+    setDashboardRefreshTrigger(prev => prev + 1);
   };
 
   const renderCurrentView = () => {
@@ -46,7 +49,10 @@ const Index = () => {
           onBackToList={() => handleViewChange('list')}
         />;
       default:
-        return <QuizDashboard onStartQuizzing={() => handleViewChange('list')} />;
+        return <QuizDashboard 
+          onStartQuizzing={() => handleViewChange('list')} 
+          refreshTrigger={dashboardRefreshTrigger}
+        />;
     }
   };
 

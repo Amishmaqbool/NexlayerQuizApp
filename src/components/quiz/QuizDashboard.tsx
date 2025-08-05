@@ -36,9 +36,10 @@ interface QuizStats {
 
 interface QuizDashboardProps {
   onStartQuizzing: () => void;
+  refreshTrigger?: number; // Add this to trigger refresh from parent
 }
 
-export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
+export const QuizDashboard = ({ onStartQuizzing, refreshTrigger }: QuizDashboardProps) => {
   const [stats, setStats] = useState<QuizStats>({
     totalQuizzes: 0,
     totalQuestions: 0,
@@ -52,43 +53,77 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
+        console.log('Fetching dashboard stats...');
+        
         // Try to fetch quiz count
-        const { count: quizCount } = await supabase
+        const { count: quizCount, error: quizError } = await supabase
           .from('quizzes')
           .select('*', { count: 'exact', head: true });
 
+        if (quizError) {
+          console.error('Error fetching quiz count:', quizError);
+        }
+
         // Try to fetch total questions
-        const { count: questionCount } = await supabase
+        const { count: questionCount, error: questionError } = await supabase
           .from('questions')
           .select('*', { count: 'exact', head: true });
 
+        if (questionError) {
+          console.error('Error fetching question count:', questionError);
+        }
+
         // Try to fetch session stats
-        const { data: sessions, count: sessionCount } = await supabase
+        const { data: sessions, count: sessionCount, error: sessionError } = await supabase
           .from('quiz_sessions')
           .select('*, quizzes(title)', { count: 'exact' })
           .order('created_at', { ascending: false })
           .limit(5);
 
+        if (sessionError) {
+          console.error('Error fetching sessions:', sessionError);
+        }
+
+        console.log('Session data:', sessions);
+        console.log('Session count:', sessionCount);
+
         // Calculate average score
-        const { data: allSessions } = await supabase
+        const { data: allSessions, error: allSessionsError } = await supabase
           .from('quiz_sessions')
-          .select('score, total_questions');
+          .select('score, total_questions')
+          .not('score', 'is', null)
+          .not('total_questions', 'is', null);
+
+        if (allSessionsError) {
+          console.error('Error fetching all sessions for average:', allSessionsError);
+        }
+
+        console.log('All sessions for average calculation:', allSessions);
 
         let avgScore = 0;
         if (allSessions && allSessions.length > 0) {
-          const totalPercentage = allSessions.reduce((sum, session) => {
-            return sum + (session.score / session.total_questions) * 100;
-          }, 0);
-          avgScore = Math.round(totalPercentage / allSessions.length);
+          const validSessions = allSessions.filter(session => 
+            session.score !== null && session.total_questions !== null && session.total_questions > 0
+          );
+          
+          if (validSessions.length > 0) {
+            const totalPercentage = validSessions.reduce((sum, session) => {
+              return sum + (session.score / session.total_questions) * 100;
+            }, 0);
+            avgScore = Math.round(totalPercentage / validSessions.length);
+          }
         }
 
-        setStats({
+        const newStats = {
           totalQuizzes: quizCount || 0,
           totalQuestions: questionCount || 0,
           totalSessions: sessionCount || 0,
           averageScore: avgScore,
           recentSessions: sessions || []
-        });
+        };
+
+        console.log('Updated stats:', newStats);
+        setStats(newStats);
       } catch (error) {
         console.error('Error fetching stats:', error);
         toast({
@@ -102,7 +137,7 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
     };
 
     fetchStats();
-  }, [toast]);
+  }, [toast, refreshTrigger]); // Add refreshTrigger to dependencies
 
   const features = [
     {
