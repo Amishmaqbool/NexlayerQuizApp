@@ -81,43 +81,13 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
         setFilteredQuizzes(quizzesWithCounts);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
-        
-        // Fallback demo data when Supabase is not available
-        const fallbackQuizzes = [
-          {
-            id: '1',
-            title: 'Nexlayer Platform Fundamentals',
-            description: 'Master the core concepts of Nexlayer\'s AI-native cloud platform, including architecture, key features, and basic operations.',
-            questionCount: 15,
-            difficulty: 'Beginner',
-            estimatedTime: 20,
-            completions: 124,
-            averageScore: 78
-          },
-          {
-            id: '2', 
-            title: 'Nexlayer CLI Mastery',
-            description: 'Learn advanced Nexlayer CLI commands, configuration management, and deployment automation techniques.',
-            questionCount: 22,
-            difficulty: 'Intermediate',
-            estimatedTime: 30,
-            completions: 89,
-            averageScore: 71
-          },
-          {
-            id: '3',
-            title: 'Cloud Infrastructure & Scaling',
-            description: 'Deep dive into cloud infrastructure patterns, auto-scaling strategies, and production deployment best practices.',
-            questionCount: 28,
-            difficulty: 'Advanced',
-            estimatedTime: 40,
-            completions: 45,
-            averageScore: 82
-          }
-        ];
-        
-        setQuizzes(fallbackQuizzes);
-        setFilteredQuizzes(fallbackQuizzes);
+        toast({
+          title: "Database Error",
+          description: "Failed to load quizzes. Please ensure the database is connected and migrations are applied.",
+          variant: "destructive",
+        });
+        setQuizzes([]);
+        setFilteredQuizzes([]);
       } finally {
         setLoading(false);
       }
@@ -159,7 +129,7 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
     <div className="max-w-7xl mx-auto space-y-8 p-6">
       {/* Header */}
       <div className="text-center space-y-4">
-        <h2 className="text-4xl font-bold bg-gradient-to-r from-nexlayer-cyan to-blue-400 bg-clip-text text-transparent">
+        <h2 className="text-4xl font-bold bg-gradient-to-r from-nexlayer-cyan to-nexlayer-cyan/80 bg-clip-text text-transparent">
           Nexlayer Quiz Collection
         </h2>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">

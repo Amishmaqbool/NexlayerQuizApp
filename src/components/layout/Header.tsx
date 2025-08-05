@@ -1,6 +1,7 @@
 import { Brain, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
+import Logo from "../../../public/logo.webp"
 
 interface HeaderProps {
   onNavigate?: (section: string) => void;
@@ -19,17 +20,9 @@ export const Header = ({ onNavigate }: HeaderProps) => {
     <header className="sticky top-0 z-50 w-full border-b border-nexlayer-cyan/20 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between px-4">
         {/* Logo */}
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-r from-nexlayer-cyan to-blue-500 rounded-lg flex items-center justify-center">
-            <Brain className="w-5 h-5 text-nexlayer-dark" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xl font-bold bg-gradient-to-r from-nexlayer-cyan to-blue-400 bg-clip-text text-transparent">
-              Nexlayer
-            </span>
-            <span className="text-xs text-muted-foreground -mt-1">Quiz Platform</span>
-          </div>
-        </div>
+        <a href="/" className="flex items-center space-x-3">
+          <img src={Logo} alt="Nexlayer Logo" className="w-full h-8" />
+        </a>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">

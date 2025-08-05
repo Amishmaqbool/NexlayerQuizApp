@@ -25,91 +25,6 @@ interface QuizTakerProps {
   onBack: () => void;
 }
 
-// Demo quiz data
-const demoQuizData = {
-  '1': {
-    id: '1',
-    title: 'Nexlayer Platform Fundamentals',
-    description: 'Master the core concepts of Nexlayer\'s AI-native cloud platform.',
-    questions: [
-      {
-        id: '1',
-        question_text: 'What is the primary advantage of Nexlayer\'s AI-native cloud platform?',
-        options: [
-          { id: '1a', option_text: 'Simplified one-command deployment', is_correct: true },
-          { id: '1b', option_text: 'Traditional multi-step setup', is_correct: false },
-          { id: '1c', option_text: 'Manual configuration required', is_correct: false },
-          { id: '1d', option_text: 'Complex deployment process', is_correct: false }
-        ]
-      },
-      {
-        id: '2',
-        question_text: 'Which command is used to initialize a new Nexlayer project?',
-        options: [
-          { id: '2a', option_text: 'nexlayer create', is_correct: false },
-          { id: '2b', option_text: 'nexlayer init', is_correct: true },
-          { id: '2c', option_text: 'nexlayer start', is_correct: false },
-          { id: '2d', option_text: 'nexlayer deploy', is_correct: false }
-        ]
-      },
-      {
-        id: '3',
-        question_text: 'What type of infrastructure does Nexlayer provide?',
-        options: [
-          { id: '3a', option_text: 'On-premise only', is_correct: false },
-          { id: '3b', option_text: 'Cloud-native infrastructure', is_correct: true },
-          { id: '3c', option_text: 'Hybrid only', is_correct: false },
-          { id: '3d', option_text: 'Edge computing only', is_correct: false }
-        ]
-      }
-    ]
-  },
-  '2': {
-    id: '2',
-    title: 'Nexlayer CLI Mastery',
-    description: 'Learn advanced Nexlayer CLI commands and techniques.',
-    questions: [
-      {
-        id: '4',
-        question_text: 'How do you deploy a Nexlayer application to production?',
-        options: [
-          { id: '4a', option_text: 'nexlayer deploy --env production', is_correct: true },
-          { id: '4b', option_text: 'nexlayer push production', is_correct: false },
-          { id: '4c', option_text: 'nexlayer build production', is_correct: false },
-          { id: '4d', option_text: 'nexlayer release production', is_correct: false }
-        ]
-      },
-      {
-        id: '5',
-        question_text: 'Which flag shows verbose output in Nexlayer CLI?',
-        options: [
-          { id: '5a', option_text: '--debug', is_correct: false },
-          { id: '5b', option_text: '--verbose', is_correct: true },
-          { id: '5c', option_text: '--detailed', is_correct: false },
-          { id: '5d', option_text: '--full', is_correct: false }
-        ]
-      }
-    ]
-  },
-  '3': {
-    id: '3',
-    title: 'Cloud Infrastructure & Scaling',
-    description: 'Deep dive into cloud infrastructure and scaling strategies.',
-    questions: [
-      {
-        id: '6',
-        question_text: 'What is the recommended approach for scaling Nexlayer applications?',
-        options: [
-          { id: '6a', option_text: 'Manual scaling only', is_correct: false },
-          { id: '6b', option_text: 'Auto-scaling with AI optimization', is_correct: true },
-          { id: '6c', option_text: 'Fixed resource allocation', is_correct: false },
-          { id: '6d', option_text: 'Vertical scaling only', is_correct: false }
-        ]
-      }
-    ]
-  }
-};
-
 export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
@@ -150,7 +65,7 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
             )
           `)
           .eq('quiz_id', quizId)
-          .order('order_index');
+          .order('created_at');
 
         if (quizError || questionsError) throw new Error('Database error');
 
@@ -162,25 +77,13 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
         setQuestions(formattedQuestions);
       } catch (error) {
         console.error('Error fetching quiz data:', error);
-        
-        // Use demo data as fallback
-        const demoData = demoQuizData[quizId as keyof typeof demoQuizData];
-        if (demoData) {
-          setQuiz({
-            id: demoData.id,
-            title: demoData.title,
-            description: demoData.description
-          });
-          setQuestions(demoData.questions);
-        } else {
-          toast({
-            title: "Error",
-            description: "Quiz not found. Please try another quiz.",
-            variant: "destructive",
-          });
-          onBack();
-          return;
-        }
+        toast({
+          title: "Database Error",
+          description: "Failed to load quiz. Please ensure the database is connected and migrations are applied.",
+          variant: "destructive",
+        });
+        onBack();
+        return;
       } finally {
         setLoading(false);
       }
@@ -328,9 +231,9 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
       </div>
 
       {/* Quiz Info */}
-      <Card className="border-nexlayer-cyan/20 bg-gradient-to-r from-nexlayer-cyan/5 to-blue-500/5">
+      <Card className="border-nexlayer-cyan/20 bg-gradient-to-r from-nexlayer-cyan/5 to-nexlayer-cyan/10">
         <CardHeader className="pb-3">
-          <CardTitle className="text-xl text-foreground">{quiz?.title}</CardTitle>
+          <CardTitle className="text-xl text-white">{quiz?.title}</CardTitle>
         </CardHeader>
       </Card>
 

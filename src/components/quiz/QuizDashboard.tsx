@@ -91,13 +91,10 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
-        // Don't show error toast, just use default values
-        setStats({
-          totalQuizzes: 3, // Default demo data
-          totalQuestions: 25,
-          totalSessions: 0,
-          averageScore: 0,
-          recentSessions: []
+        toast({
+          title: "Error",
+          description: "Failed to load dashboard stats. Please ensure database is connected.",
+          variant: "destructive",
         });
       } finally {
         setLoading(false);
@@ -130,7 +127,7 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
       icon: Users,
       title: "Agent Friendly",
       description: "Explore the future of autonomous deployments and AI agents",
-      color: "text-purple-500"
+      color: "text-nexlayer-cyan"
     }
   ];
 
@@ -146,7 +143,7 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto animate-fade-in">
+    <div className="py-20 max-w-7xl mx-auto animate-fade-in">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center px-4 py-2 rounded-full bg-nexlayer-cyan/10 border border-nexlayer-cyan/20 mb-6">
@@ -196,10 +193,10 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
         <Card className="border-border/50 bg-card/80 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-muted-foreground">Attempts</CardTitle>
-            <TrendingUp className="h-4 w-4 text-blue-500" />
+            <TrendingUp className="h-4 w-4 text-nexlayer-cyan" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-500">{stats.totalSessions}</div>
+            <div className="text-2xl font-bold text-nexlayer-cyan">{stats.totalSessions}</div>
             <p className="text-xs text-muted-foreground">Total quiz attempts</p>
           </CardContent>
         </Card>
@@ -282,11 +279,11 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
       </div>
 
       {/* Call to Action */}
-      <Card className="border-nexlayer-cyan/20 bg-gradient-to-r from-nexlayer-cyan/5 to-blue-500/5 backdrop-blur-sm">
+      <Card className="border-nexlayer-cyan/20 bg-gradient-to-r from-nexlayer-cyan/5 to-nexlayer-cyan/10 backdrop-blur-sm">
         <CardContent className="p-8 text-center">
           <div className="mb-4">
             <Brain className="w-12 h-12 text-nexlayer-cyan mx-auto mb-4" />
-            <h4 className="text-2xl font-bold text-foreground mb-2">Ready to Master Nexlayer?</h4>
+            <h4 className="text-2xl font-bold text-white mb-2">Ready to Master Nexlayer?</h4>
             <p className="text-muted-foreground mb-6 max-w-2xl mx-auto">
               Join thousands of developers who are mastering the future of cloud deployment. 
               Test your knowledge and become an expert in AI-native infrastructure.

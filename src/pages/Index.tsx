@@ -51,7 +51,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col">
+    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col" style={{backgroundColor: '#191919'}}>
       {/* Header */}
       <Header onNavigate={(section) => {
         if (section === 'quizzes') {

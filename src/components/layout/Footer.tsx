@@ -1,5 +1,6 @@
 import { Brain, Twitter, Github, Globe, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import Logo from "../../../public/logo.webp";
 
 export const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -10,17 +11,9 @@ export const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-nexlayer-cyan to-blue-500 rounded-lg flex items-center justify-center">
-                <Brain className="w-5 h-5 text-nexlayer-dark" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-lg font-bold bg-gradient-to-r from-nexlayer-cyan to-blue-400 bg-clip-text text-transparent">
-                  Nexlayer
-                </span>
-                <span className="text-xs text-muted-foreground -mt-1">Quiz Platform</span>
-              </div>
-            </div>
+            <a href="/" className="flex items-center space-x-3">
+              <img src={Logo} alt="Nexlayer Logo" className="w-40 h-8" />
+            </a>
             <p className="text-sm text-muted-foreground">
               Master the AI-Native Cloud Platform with comprehensive quizzes. 
               From prototype to product, no infrastructure PhD required.
