@@ -184,20 +184,20 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
   const selectedAnswer = selectedAnswers[currentQuestion.id];
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div className="max-w-4xl mx-auto animate-fade-in">
       <div className="mb-6">
-        <Button variant="ghost" onClick={onBack} className="mb-4">
+        <Button variant="ghost" onClick={onBack} className="mb-4 hover:bg-nexlayer-cyan/10 hover:text-nexlayer-cyan">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Quizzes
         </Button>
-        <h2 className="text-2xl font-bold mb-2">{quiz.title}</h2>
-        <Progress value={progress} className="w-full" />
+        <h2 className="text-3xl font-bold mb-2 text-nexlayer-cyan">{quiz.title}</h2>
+        <Progress value={progress} className="w-full h-2 bg-muted" />
         <p className="text-sm text-muted-foreground mt-2">
           Question {currentQuestionIndex + 1} of {questions.length}
         </p>
       </div>
 
-      <Card>
+      <Card className="border-border/50 bg-card/80 backdrop-blur-sm shadow-xl">
         <CardHeader>
           <CardTitle className="text-lg">{currentQuestion.question_text}</CardTitle>
         </CardHeader>
@@ -227,11 +227,11 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
             </Button>
 
             {currentQuestionIndex === questions.length - 1 ? (
-              <Button onClick={handleSubmit} disabled={!selectedAnswer}>
+              <Button onClick={handleSubmit} disabled={!selectedAnswer} className="bg-nexlayer-cyan hover:bg-nexlayer-cyan/90 text-nexlayer-dark font-semibold">
                 Submit Quiz
               </Button>
             ) : (
-              <Button onClick={handleNext} disabled={!selectedAnswer}>
+              <Button onClick={handleNext} disabled={!selectedAnswer} className="bg-nexlayer-cyan hover:bg-nexlayer-cyan/90 text-nexlayer-dark font-semibold">
                 Next
                 <ArrowRight className="w-4 h-4 ml-2" />
               </Button>

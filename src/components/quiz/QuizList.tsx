@@ -71,11 +71,11 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <h2 className="text-2xl font-bold mb-6 text-center">Available Quizzes</h2>
+    <div className="max-w-6xl mx-auto animate-fade-in">
+      <h2 className="text-3xl font-bold mb-8 text-center text-nexlayer-cyan">Available Quizzes</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {quizzes.map((quiz) => (
-          <Card key={quiz.id} className="hover:shadow-lg transition-shadow">
+        {quizzes.map((quiz, index) => (
+          <Card key={quiz.id} className="hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/50 backdrop-blur-sm animate-scale-in" style={{animationDelay: `${index * 0.1}s`}}>
             <CardHeader>
               <CardTitle className="text-lg">{quiz.title}</CardTitle>
               <CardDescription>{quiz.description}</CardDescription>
@@ -85,7 +85,7 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
                 <span className="text-sm text-muted-foreground">
                   {quiz.questionCount} questions
                 </span>
-                <Button onClick={() => onQuizSelect(quiz.id)}>
+                <Button onClick={() => onQuizSelect(quiz.id)} className="bg-nexlayer-cyan hover:bg-nexlayer-cyan/90 text-nexlayer-dark font-semibold">
                   Start Quiz
                 </Button>
               </div>
