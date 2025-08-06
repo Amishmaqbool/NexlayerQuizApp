@@ -114,19 +114,8 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-center">
-          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4 text-nexlayer-cyan" />
-          <p className="text-muted-foreground">Loading quizzes...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-7xl mx-auto space-y-8 p-6">
+    <div className="py-28 max-w-7xl mx-auto space-y-8 px-6">
       {/* Header */}
       <div className="text-center space-y-4">
         <h2 className="text-4xl font-bold bg-gradient-to-r from-nexlayer-cyan to-nexlayer-cyan/80 bg-clip-text text-transparent">

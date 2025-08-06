@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { QuizDashboard } from "@/components/quiz/QuizDashboard";
 import { QuizList } from "@/components/quiz/QuizList";
 import { QuizTaker } from "@/components/quiz/QuizTaker";
@@ -17,6 +18,7 @@ const Index = () => {
   const [currentView, setCurrentView] = useState<'dashboard' | 'list' | 'quiz' | 'results'>('dashboard');
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [sessionData, setSessionData] = useState<any>(null);
+  const navigate = useNavigate();
 
   // Show loading spinner while checking authentication
   if (loading) {
@@ -71,8 +73,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background relative overflow-hidden flex flex-col" style={{backgroundColor: '#191919'}}>
-      {/* Header */}
+    <div className="background-svg min-h-screen bg-background relative overflow-hidden flex flex-col" style={{backgroundColor: '#191919'}}>
       <Header onNavigate={(section) => {
         if (section === 'list') {
           handleViewChange('list');
@@ -82,12 +83,10 @@ const Index = () => {
         // External links are handled directly in the Header component
       }} />
 
-      {/* Main Content */}
       <main className="flex-1">
         {renderCurrentView()}
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );

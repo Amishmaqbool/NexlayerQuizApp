@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,6 +42,7 @@ interface QuizDashboardProps {
 
 export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState<QuizStats>({
     totalQuizzes: 0,
     totalQuestions: 0,
@@ -128,48 +130,41 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
       icon: Brain,
       title: "AI-Native Platform",
       description: "Learn about Nexlayer's revolutionary approach to cloud deployment",
-      color: "text-nexlayer-cyan"
+      color: "text-nexlayer-cyan",
+      docPath: "ai-native-platform"
     },
     {
       icon: Zap,
       title: "One Command Deploy",
       description: "Master the art of deploying entire stacks with a single command",
-      color: "text-yellow-500"
+      color: "text-yellow-500",
+      docPath: "one-command-deploy"
     },
     {
       icon: Target,
       title: "Production Ready",
       description: "Understand enterprise-grade infrastructure and scaling",
-      color: "text-green-500"
+      color: "text-green-500",
+      docPath: "production-ready"
     },
     {
       icon: Users,
       title: "Agent Friendly",
       description: "Explore the future of autonomous deployments and AI agents",
-      color: "text-nexlayer-cyan"
+      color: "text-nexlayer-cyan",
+      docPath: "agent-friendly"
     }
   ];
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <div className="text-center">
-          <div className="w-8 h-8 border-4 border-nexlayer-cyan border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="py-20 max-w-7xl mx-auto animate-fade-in">
+    <div className="py-20 max-w-7xl mx-auto animate-fade-in mt-16">
       {/* Hero Section */}
       <div className="text-center mb-12">
         <div className="inline-flex items-center px-4 py-2 rounded-full bg-nexlayer-cyan/10 border border-nexlayer-cyan/20 mb-6">
           <Star className="w-4 h-4 text-nexlayer-cyan mr-2" />
           <span className="text-sm font-medium text-nexlayer-cyan">Master the AI-Native Cloud</span>
         </div>
-        <h3 className="text-2xl font-bold text-foreground mb-4">
+        <h3 className="text-6xl font-bold text-foreground mb-4">
           Test Your Knowledge of Modern Cloud Infrastructure
         </h3>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto mb-8">
@@ -238,15 +233,22 @@ export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
           <h4 className="text-xl font-bold text-foreground mb-6">What You'll Learn</h4>
           <div className="space-y-4">
             {features.map((feature, index) => (
-              <Card key={index} className="border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:-translate-y-1">
+              <Card 
+                key={index} 
+                className="border-border/50 bg-card/50 backdrop-blur-sm hover:bg-card/80 transition-all duration-300 hover:-translate-y-1 cursor-pointer group" 
+                onClick={() => navigate(`/docs/${feature.docPath}`)}
+              >
                 <CardContent className="p-4">
                   <div className="flex items-start space-x-4">
-                    <div className={`p-2 rounded-lg bg-background/50`}>
-                      <feature.icon className={`w-5 h-5 ${feature.color}`} />
+                    <div className={`p-2 rounded-lg bg-background/50 group-hover:bg-nexlayer-cyan/10 transition-colors`}>
+                      <feature.icon className={`w-5 h-5 ${feature.color} group-hover:scale-110 transition-transform`} />
                     </div>
                     <div className="flex-1">
-                      <h5 className="font-semibold text-foreground mb-1">{feature.title}</h5>
+                      <h5 className="font-semibold text-foreground mb-1 group-hover:text-nexlayer-cyan transition-colors">{feature.title}</h5>
                       <p className="text-sm text-muted-foreground">{feature.description}</p>
+                      <p className="text-xs text-nexlayer-cyan/70 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        Click to read documentation →
+                      </p>
                     </div>
                   </div>
                 </CardContent>

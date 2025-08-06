@@ -72,9 +72,20 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
         if (quizError || questionsError) throw new Error('Database error');
 
         setQuiz(quizData);
+        
+        // Shuffle options for each question to randomize answer positions
+        const shuffleArray = (array: any[]) => {
+          const shuffled = [...array];
+          for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+          }
+          return shuffled;
+        };
+        
         const formattedQuestions = questionsData.map(q => ({
           ...q,
-          options: q.question_options || []
+          options: shuffleArray(q.question_options || [])
         }));
         setQuestions(formattedQuestions);
       } catch (error) {

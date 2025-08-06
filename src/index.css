@@ -99,3 +99,9 @@ All colors MUST be HSL.
     min-height: 100vh;
   }
 }
+
+.background-svg {
+  background-image: url('/public/background.svg');
+  background-size: contain;
+  background-position: center;
+}
