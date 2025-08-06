@@ -27,32 +27,73 @@ export const AuthComponent = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Basic validation
+    if (!email || !password) {
+      toast({
+        title: "Please fill in all fields",
+        description: "Email and password are required.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
+    if (isSignUp && password.length < 6) {
+      toast({
+        title: "Password too short", 
+        description: "Password must be at least 6 characters long.",
+        variant: "destructive",
+      });
+      setLoading(false);
+      return;
+    }
+
     try {
+      console.log(`Attempting ${isSignUp ? 'sign up' : 'sign in'} from:`, window.location.origin);
+      
       const { error } = isSignUp
         ? await signUp(email, password)
         : await signIn(email, password);
 
       if (error) {
+        console.error('Authentication error:', error);
+        
+        // Handle common Supabase errors with user-friendly messages
+        let errorMessage = error.message;
+        if (error.message?.includes('Invalid login credentials')) {
+          errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+        } else if (error.message?.includes('Email not confirmed')) {
+          errorMessage = 'Please check your email and click the confirmation link before signing in.';
+        } else if (error.message?.includes('User already registered')) {
+          errorMessage = 'An account with this email already exists. Try signing in instead.';
+        }
+        
         toast({
           title: "Authentication Error",
-          description: error.message,
+          description: errorMessage,
           variant: "destructive",
         });
       } else if (isSignUp) {
+        console.log('Signup successful, confirmation email sent');
         toast({
-          title: "Success!",
-          description: "Please check your email to confirm your account.",
+          title: "Check Your Email!",
+          description: `We've sent a confirmation link to ${email}. Please click the link to activate your account.`,
         });
+        // Clear the form after successful signup
+        setEmail("");
+        setPassword("");
       } else {
+        console.log('Sign in successful');
         toast({
           title: "Welcome back!",
           description: "Successfully signed in.",
         });
       }
     } catch (error: any) {
+      console.error('Unexpected error:', error);
       toast({
         title: "Error",
-        description: "An unexpected error occurred.",
+        description: error?.message || "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
     } finally {

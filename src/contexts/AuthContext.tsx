@@ -56,9 +56,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    // Dynamically get the current domain where the user is signing up
+    const currentOrigin = window.location.origin;
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        emailRedirectTo: `${currentOrigin}/auth/callback`
+      }
     });
     return { error };
   };
