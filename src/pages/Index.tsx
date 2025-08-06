@@ -5,16 +5,35 @@ import { QuizTaker } from "@/components/quiz/QuizTaker";
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { AuthComponent } from "@/components/auth/AuthComponent";
+import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Brain, Zap, Globe, Shield, Clock, TrendingUp } from "lucide-react";
+import { Brain, Zap, Globe, Shield, Clock, TrendingUp, Loader2 } from "lucide-react";
 
 const Index = () => {
+  const { user, loading } = useAuth();
   const [currentView, setCurrentView] = useState<'dashboard' | 'list' | 'quiz' | 'results'>('dashboard');
   const [selectedQuizId, setSelectedQuizId] = useState<string | null>(null);
   const [sessionData, setSessionData] = useState<any>(null);
-  const [dashboardRefreshTrigger, setDashboardRefreshTrigger] = useState(0);
+
+  // Show loading spinner while checking authentication
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center" style={{backgroundColor: '#191919'}}>
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-nexlayer-cyan mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Show auth component if user is not logged in
+  if (!user) {
+    return <AuthComponent />;
+  }
 
   const handleViewChange = (view: 'dashboard' | 'list' | 'quiz' | 'results', quizId?: string) => {
     setCurrentView(view);
@@ -26,8 +45,6 @@ const Index = () => {
   const handleQuizComplete = (data: any) => {
     setSessionData(data);
     setCurrentView('results');
-    // Trigger dashboard refresh when quiz is completed
-    setDashboardRefreshTrigger(prev => prev + 1);
   };
 
   const renderCurrentView = () => {
@@ -49,10 +66,7 @@ const Index = () => {
           onBackToList={() => handleViewChange('list')}
         />;
       default:
-        return <QuizDashboard 
-          onStartQuizzing={() => handleViewChange('list')} 
-          refreshTrigger={dashboardRefreshTrigger}
-        />;
+        return <QuizDashboard onStartQuizzing={() => handleViewChange('list')} />;
     }
   };
 
@@ -60,11 +74,12 @@ const Index = () => {
     <div className="min-h-screen bg-background relative overflow-hidden flex flex-col" style={{backgroundColor: '#191919'}}>
       {/* Header */}
       <Header onNavigate={(section) => {
-        if (section === 'quizzes') {
+        if (section === 'list') {
           handleViewChange('list');
         } else if (section === 'dashboard') {
           handleViewChange('dashboard');
         }
+        // External links are handled directly in the Header component
       }} />
 
       {/* Main Content */}

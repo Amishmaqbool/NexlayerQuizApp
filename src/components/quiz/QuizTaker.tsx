@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
@@ -26,6 +27,7 @@ interface QuizTakerProps {
 }
 
 export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
+  const { user } = useAuth();
   const [quiz, setQuiz] = useState<any>(null);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -144,62 +146,59 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
 
       // Try to save to database
       try {
-        console.log('Attempting to save quiz session:', {
-          quiz_id: quizId,
-          score,
-          total_questions: questions.length,
-          completed_at: new Date().toISOString()
-        });
-
-        // First, let's test the connection by checking if the table exists
-        const { data: testData, error: testError } = await supabase
-          .from('quiz_sessions')
-          .select('count', { count: 'exact', head: true });
+        console.log('=== QUIZ SUBMISSION DEBUG ===');
+        console.log('User object:', user);
+        console.log('User ID:', user?.id);
+        console.log('User ID type:', typeof user?.id);
+        console.log('User ID length:', user?.id?.length);
+        console.log('Quiz ID:', quizId);
+        console.log('Score:', score);
+        console.log('Total questions:', questions.length);
         
-        if (testError) {
-          console.error('Table access error:', testError);
-          throw new Error(`Cannot access quiz_sessions table: ${testError.message}`);
+        // Make sure we have a user before trying to save
+        if (!user || !user.id) {
+          console.error('❌ No authenticated user found');
+          toast({
+            title: "Authentication Required",
+            description: "Please sign in to save your quiz results.",
+            variant: "destructive",
+          });
+          return;
         }
-
-        console.log('Table access successful, attempting insert...');
-
-        const insertData = {
-          quiz_id: quizId,
-          score,
-          total_questions: questions.length,
-          completed_at: new Date().toISOString()
-        };
-
+        
+        console.log('Calling simplified insert (without time_spent field)...');
+        
+        // Use simplified insert without problematic fields
         const { data, error } = await supabase
           .from('quiz_sessions')
-          .insert(insertData)
+          .insert([{
+            quiz_id: quizId,
+            user_id: user.id,
+            score: score,
+            total_questions: questions.length
+          }])
           .select();
         
         if (error) {
-          console.error('Database insert error:', error);
-          console.error('Error details:', {
-            message: error.message,
-            details: error.details,
-            hint: error.hint,
-            code: error.code
-          });
+          console.error('❌ Database error:', error);
           toast({
             title: "Database Error",
             description: `Failed to save quiz session: ${error.message}`,
             variant: "destructive",
           });
         } else {
-          console.log('Quiz session saved successfully to database:', data);
+          console.log('✅ Quiz session saved successfully to database');
+          console.log('Inserted data:', data);
           toast({
-            title: "Success",
-            description: "Quiz completed and saved successfully!",
+            title: "Quiz Completed!",
+            description: "Your results have been saved successfully.",
           });
         }
       } catch (dbError) {
-        console.error('Could not save to database:', dbError);
+        console.error('❌ Could not save to database:', dbError);
         toast({
-          title: "Database Connection Error",
-          description: `Database error: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`,
+          title: "Save Error",
+          description: "Failed to save quiz results. Please try again.",
           variant: "destructive",
         });
       }

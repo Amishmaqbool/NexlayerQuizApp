@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -36,10 +37,10 @@ interface QuizStats {
 
 interface QuizDashboardProps {
   onStartQuizzing: () => void;
-  refreshTrigger?: number; // Add this to trigger refresh from parent
 }
 
-export const QuizDashboard = ({ onStartQuizzing, refreshTrigger }: QuizDashboardProps) => {
+export const QuizDashboard = ({ onStartQuizzing }: QuizDashboardProps) => {
+  const { user } = useAuth();
   const [stats, setStats] = useState<QuizStats>({
     totalQuizzes: 0,
     totalQuestions: 0,
@@ -52,53 +53,39 @@ export const QuizDashboard = ({ onStartQuizzing, refreshTrigger }: QuizDashboard
 
   useEffect(() => {
     const fetchStats = async () => {
+      if (!user) {
+        console.log('No user in QuizDashboard');
+        return;
+      }
+      
+      console.log('Fetching stats for user:', user.id);
+      
       try {
-        console.log('Fetching dashboard stats...');
-        
-        // Try to fetch quiz count
-        const { count: quizCount, error: quizError } = await supabase
+        // Try to fetch quiz count (total available quizzes)
+        const { count: quizCount } = await supabase
           .from('quizzes')
           .select('*', { count: 'exact', head: true });
 
-        if (quizError) {
-          console.error('Error fetching quiz count:', quizError);
-        }
-
-        // Try to fetch total questions
-        const { count: questionCount, error: questionError } = await supabase
+        // Try to fetch total questions (total available questions)
+        const { count: questionCount } = await supabase
           .from('questions')
           .select('*', { count: 'exact', head: true });
 
-        if (questionError) {
-          console.error('Error fetching question count:', questionError);
-        }
-
-        // Try to fetch session stats
-        const { data: sessions, count: sessionCount, error: sessionError } = await supabase
+        // Try to fetch session stats for the current user only
+        const { data: sessions, count: sessionCount } = await supabase
           .from('quiz_sessions')
           .select('*, quizzes(title)', { count: 'exact' })
+          .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(5);
 
-        if (sessionError) {
-          console.error('Error fetching sessions:', sessionError);
-        }
-
-        console.log('Session data:', sessions);
-        console.log('Session count:', sessionCount);
-
-        // Calculate average score
-        const { data: allSessions, error: allSessionsError } = await supabase
+        // Calculate average score for the current user only
+        const { data: allSessions } = await supabase
           .from('quiz_sessions')
           .select('score, total_questions')
+          .eq('user_id', user.id)
           .not('score', 'is', null)
           .not('total_questions', 'is', null);
-
-        if (allSessionsError) {
-          console.error('Error fetching all sessions for average:', allSessionsError);
-        }
-
-        console.log('All sessions for average calculation:', allSessions);
 
         let avgScore = 0;
         if (allSessions && allSessions.length > 0) {
@@ -114,16 +101,13 @@ export const QuizDashboard = ({ onStartQuizzing, refreshTrigger }: QuizDashboard
           }
         }
 
-        const newStats = {
+        setStats({
           totalQuizzes: quizCount || 0,
           totalQuestions: questionCount || 0,
           totalSessions: sessionCount || 0,
           averageScore: avgScore,
           recentSessions: sessions || []
-        };
-
-        console.log('Updated stats:', newStats);
-        setStats(newStats);
+        });
       } catch (error) {
         console.error('Error fetching stats:', error);
         toast({
@@ -137,7 +121,7 @@ export const QuizDashboard = ({ onStartQuizzing, refreshTrigger }: QuizDashboard
     };
 
     fetchStats();
-  }, [toast, refreshTrigger]); // Add refreshTrigger to dependencies
+  }, [user, toast]);
 
   const features = [
     {

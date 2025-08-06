@@ -43,47 +43,21 @@ async function testConnection() {
       console.log(`✅ Found ${options.length} answer options`);
     }
 
-    // Test quiz_sessions table
-    console.log('\n🧪 Testing quiz_sessions table structure...');
+    // Test quiz sessions
     const { data: sessions, error: sessionsError } = await supabase
       .from('quiz_sessions')
-      .select('*');
+      .select('*')
+      .order('created_at', { ascending: false });
     
     if (sessionsError) {
-      console.error('❌ Quiz sessions error:', sessionsError);
+      console.error('❌ Sessions error:', sessionsError);
     } else {
       console.log(`✅ Found ${sessions.length} quiz sessions`);
-    }
-
-    // Test inserting into quiz_sessions with the structure that QuizTaker now uses
-    console.log('\n🧪 Testing quiz_sessions insert with QuizTaker structure...');
-    
-    // Get a real quiz ID to use for testing
-    if (quizzes.length > 0) {
-      const quizTakerStructure = {
-        quiz_id: quizzes[0].id,
-        score: 8,
-        total_questions: 16,
-        completed_at: new Date().toISOString()
-      };
-      
-      const { data: insertData, error: insertError } = await supabase
-        .from('quiz_sessions')
-        .insert(quizTakerStructure)
-        .select();
-      
-      if (insertError) {
-        console.error('❌ QuizTaker structure insert test failed:', insertError);
-      } else {
-        console.log('✅ QuizTaker structure insert successful:', insertData);
-        
-        // Clean up the test data
-        await supabase
-          .from('quiz_sessions')
-          .delete()
-          .eq('id', insertData[0].id);
-        
-        console.log('✅ Test data cleaned up');
+      if (sessions.length > 0) {
+        console.log('   All sessions:');
+        sessions.forEach((session, index) => 
+          console.log(`   ${index + 1}. Quiz: ${session.quiz_id}, User: ${session.user_id || 'Anonymous'}, Score: ${session.score}/${session.total_questions}, Created: ${session.created_at}`)
+        );
       }
     }
     

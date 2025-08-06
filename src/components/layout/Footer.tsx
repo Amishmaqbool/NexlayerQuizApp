@@ -1,4 +1,4 @@
-import { Brain, Twitter, Github, Globe, Mail } from "lucide-react";
+import { Brain, X, Github, Globe, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const Footer = () => {
@@ -84,14 +84,16 @@ export const Footer = () => {
                   variant="outline"
                   size="sm"
                   className="border-nexlayer-cyan/20 hover:bg-nexlayer-cyan/10 hover:border-nexlayer-cyan"
+                  onClick={() => window.open("https://x.com/nexlayerai", "_blank")}
                 >
-                  <Twitter className="w-4 h-4" />
-                  <span className="sr-only">Twitter</span>
+                  <X className="w-4 h-4" />
+                  <span className="sr-only">X (formerly Twitter)</span>
                 </Button>
                 <Button
                   variant="outline"
                   size="sm"
                   className="border-nexlayer-cyan/20 hover:bg-nexlayer-cyan/10 hover:border-nexlayer-cyan"
+                  onClick={() => window.open("https://github.com/Nexlayer/documentation/issues", "_blank")}
                 >
                   <Github className="w-4 h-4" />
                   <span className="sr-only">GitHub</span>
@@ -100,6 +102,7 @@ export const Footer = () => {
                   variant="outline"
                   size="sm"
                   className="border-nexlayer-cyan/20 hover:bg-nexlayer-cyan/10 hover:border-nexlayer-cyan"
+                  onClick={() => window.open("mailto:sales@nexlayer.com")}
                 >
                   <Mail className="w-4 h-4" />
                   <span className="sr-only">Email</span>
