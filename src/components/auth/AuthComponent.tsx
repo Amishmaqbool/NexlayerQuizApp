@@ -12,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 import { Eye, EyeOff, Brain, Zap } from "lucide-react";
-import Logo from "../../../public/logo.webp";
 
 export const AuthComponent = () => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -123,7 +122,7 @@ export const AuthComponent = () => {
           {/* Logo and Title */}
           <div className="flex items-center justify-center pt-3">
             <div>
-              <img src={Logo} alt="Nexlayer Logo" className="w-48 h-10" />
+              <img src="/logo.webp" alt="Nexlayer Logo" className="w-48 h-10" />
             </div>
           </div>
 
@@ -211,6 +210,7 @@ export const AuthComponent = () => {
                 : "Don't have an account? Sign up"}
             </Button>
           </div>
+
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { QuizDashboard } from "@/components/quiz/QuizDashboard";
-import { QuizList } from "@/components/quiz/QuizList";
+import { RobustQuizList } from "@/components/quiz/RobustQuizList";
 import { QuizTaker } from "@/components/quiz/QuizTaker";
 import { QuizResults } from "@/components/quiz/QuizResults";
 import { Header } from "@/components/layout/Header";
@@ -52,7 +52,7 @@ const Index = () => {
   const renderCurrentView = () => {
     switch (currentView) {
       case 'list':
-        return <QuizList onQuizSelect={(quizId) => handleViewChange('quiz', quizId)} />;
+        return <RobustQuizList onQuizSelect={(quizId) => handleViewChange('quiz', quizId)} />;
       case 'quiz':
         return selectedQuizId ? 
           <QuizTaker 
@@ -60,7 +60,7 @@ const Index = () => {
             onComplete={handleQuizComplete} 
             onBack={() => handleViewChange('list')}
           /> : 
-          <QuizList onQuizSelect={(quizId) => handleViewChange('quiz', quizId)} />;
+          <RobustQuizList onQuizSelect={(quizId) => handleViewChange('quiz', quizId)} />;
       case 'results':
         return <QuizResults 
           sessionData={sessionData} 
