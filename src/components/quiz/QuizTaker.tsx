@@ -49,30 +49,59 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
   useEffect(() => {
     const fetchQuizData = async () => {
       try {
-        // Try to fetch from Supabase first
+        console.log('🚀 QuizTaker: Fetching quiz data for ID:', quizId);
+        
+        // Fetch quiz details
         const { data: quizData, error: quizError } = await supabase
           .from('quizzes')
           .select('*')
           .eq('id', quizId)
           .single();
 
+        if (quizError) {
+          console.error('❌ QuizTaker: Error fetching quiz:', quizError);
+          throw quizError;
+        }
+
+        console.log('✅ QuizTaker: Quiz data:', quizData);
+
+        // Fetch questions with their options
         const { data: questionsData, error: questionsError } = await supabase
           .from('questions')
-          .select(`
-            *,
-            question_options (
-              id,
-              option_text,
-              is_correct
-            )
-          `)
+          .select('*')
           .eq('quiz_id', quizId)
-          .order('created_at');
+          .order('order_index');
 
-        if (quizError || questionsError) throw new Error('Database error');
+        if (questionsError) {
+          console.error('❌ QuizTaker: Error fetching questions:', questionsError);
+          throw questionsError;
+        }
 
-        setQuiz(quizData);
-        
+        console.log('✅ QuizTaker: Questions data:', questionsData);
+
+        // Fetch options for all questions
+        const { data: optionsData, error: optionsError } = await supabase
+          .from('options')
+          .select('*')
+          .in('question_id', questionsData.map(q => q.id))
+          .order('order_index');
+
+        if (optionsError) {
+          console.error('❌ QuizTaker: Error fetching options:', optionsError);
+          throw optionsError;
+        }
+
+        console.log('✅ QuizTaker: Options data:', optionsData);
+
+        // Group options by question_id
+        const optionsByQuestion = optionsData.reduce((acc, option) => {
+          if (!acc[option.question_id]) {
+            acc[option.question_id] = [];
+          }
+          acc[option.question_id].push(option);
+          return acc;
+        }, {} as Record<string, any[]>);
+
         // Shuffle options for each question to randomize answer positions
         const shuffleArray = (array: any[]) => {
           const shuffled = [...array];
@@ -85,14 +114,20 @@ export const QuizTaker = ({ quizId, onComplete, onBack }: QuizTakerProps) => {
         
         const formattedQuestions = questionsData.map(q => ({
           ...q,
-          options: shuffleArray(q.question_options || [])
+          options: shuffleArray(optionsByQuestion[q.id] || [])
         }));
+
+        console.log('✅ QuizTaker: Formatted questions:', formattedQuestions);
+        
+        setQuiz(quizData);
         setQuestions(formattedQuestions);
+        
       } catch (error) {
-        console.error('Error fetching quiz data:', error);
+        console.error('💥 QuizTaker: Error fetching quiz data:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
         toast({
-          title: "Database Error",
-          description: "Failed to load quiz. Please ensure the database is connected and migrations are applied.",
+          title: "Quiz Loading Error",
+          description: `Failed to load quiz: ${errorMessage}`,
           variant: "destructive",
         });
         onBack();

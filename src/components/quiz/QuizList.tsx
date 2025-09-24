@@ -32,58 +32,70 @@ export const QuizList = ({ onQuizSelect }: QuizListProps) => {
   useEffect(() => {
     const fetchQuizzes = async () => {
       try {
+        console.log('Fetching quizzes...');
         const { data: quizzesData, error: quizzesError } = await supabase
           .from('quizzes')
           .select('*')
           .order('created_at', { ascending: false });
 
-        if (quizzesError) throw quizzesError;
+        if (quizzesError) {
+          console.error('Quiz fetch error:', quizzesError);
+          throw quizzesError;
+        }
 
-        // Get question counts and stats for each quiz
+        console.log('Fetched quizzes:', quizzesData);
+
+        // Get question counts for each quiz with error handling
         const quizzesWithCounts = await Promise.all(
           (quizzesData || []).map(async (quiz) => {
-            const { count } = await supabase
-              .from('questions')
-              .select('*', { count: 'exact', head: true })
-              .eq('quiz_id', quiz.id);
+            try {
+              const { count, error: countError } = await supabase
+                .from('questions')
+                .select('*', { count: 'exact', head: true })
+                .eq('quiz_id', quiz.id);
 
-            // Get completion stats
-            const { data: sessions, count: completionCount } = await supabase
-              .from('quiz_sessions')
-              .select('score, total_questions', { count: 'exact' })
-              .eq('quiz_id', quiz.id);
+              if (countError) {
+                console.error('Question count error for quiz', quiz.id, ':', countError);
+                // Continue with default values instead of failing
+              }
 
-            let averageScore = 0;
-            if (sessions && sessions.length > 0) {
-              const totalPercentage = sessions.reduce((sum, session) => {
-                return sum + (session.score / session.total_questions) * 100;
-              }, 0);
-              averageScore = Math.round(totalPercentage / sessions.length);
+              const questionCount = count || 0;
+              
+              // Set default values without trying to access quiz_sessions for now
+              const difficulty = questionCount <= 3 ? 'Beginner' : questionCount <= 6 ? 'Intermediate' : 'Advanced';
+              const estimatedTime = Math.max(questionCount * 1.5, 5); // At least 5 minutes
+
+              return {
+                ...quiz,
+                questionCount,
+                difficulty,
+                estimatedTime,
+                completions: 0, // Default value for now
+                averageScore: 0  // Default value for now
+              };
+            } catch (error) {
+              console.error('Error processing quiz', quiz.id, ':', error);
+              // Return quiz with default values if there's an error
+              return {
+                ...quiz,
+                questionCount: 0,
+                difficulty: 'Beginner',
+                estimatedTime: 5,
+                completions: 0,
+                averageScore: 0
+              };
             }
-
-            // Estimate difficulty and time based on question count
-            const questionCount = count || 0;
-            const difficulty = questionCount <= 10 ? 'Beginner' : questionCount <= 20 ? 'Intermediate' : 'Advanced';
-            const estimatedTime = Math.ceil(questionCount * 1.5); // 1.5 minutes per question
-
-            return {
-              ...quiz,
-              questionCount,
-              difficulty,
-              estimatedTime,
-              completions: completionCount || 0,
-              averageScore
-            };
           })
         );
 
+        console.log('Processed quizzes:', quizzesWithCounts);
         setQuizzes(quizzesWithCounts);
         setFilteredQuizzes(quizzesWithCounts);
       } catch (error) {
         console.error('Error fetching quizzes:', error);
         toast({
           title: "Database Error",
-          description: "Failed to load quizzes. Please ensure the database is connected and migrations are applied.",
+          description: `Failed to load quizzes: ${error.message || 'Unknown error'}`,
           variant: "destructive",
         });
         setQuizzes([]);

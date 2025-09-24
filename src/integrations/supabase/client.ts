@@ -2,8 +2,16 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 
-const SUPABASE_URL = "https://kqxxxadltupciizuxacc.supabase.co";
-const SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtxeHh4YWRsdHVwY2lpenV4YWNjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQ0MTg4MzYsImV4cCI6MjA2OTk5NDgzNn0.bY2IKsKhXqePwzRoiEwv9ktyX8jqja9n9AJhzZxGaSE";
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || "https://akvosefdzorjkekcjdkf.supabase.co";
+const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrdm9zZWZkem9yamtla2NqZGtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Mzc0NTMsImV4cCI6MjA3NDMxMzQ1M30.b82SKHUy1InN0ZB6XqHeFe9LbDk6fpu7qKPfrEIoLT0";
+
+// Validate environment variables
+if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+  console.error('Missing Supabase environment variables!');
+  console.log('Please check your .env file and ensure you have:');
+  console.log('VITE_SUPABASE_URL=your_supabase_url');
+  console.log('VITE_SUPABASE_ANON_KEY=your_supabase_anon_key');
+}
 
 // Import the supabase client like this:
 // import { supabase } from "@/integrations/supabase/client";
