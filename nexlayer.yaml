@@ -2,13 +2,11 @@ application:
   name: "nexlayer-quiz-app"
   pods:
     - name: "frontend"
-      image: "node:18-alpine"
+      image: "registry.nexlayer.io/nexlayer-mcp/ac2b2fb10a0cf3682bce31f19f87895e/nexlayerquizapp-366def1c-frontend:6d4278e6-1758748992"
       path: "/"
       servicePorts: [3000]
       vars:
         NODE_ENV: "production"
         VITE_SUPABASE_URL: "<% URL %>"
-        VITE_SUPABASE_ANON_KEY: "your-supabase-anon-key"
+        VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0"
         PORT: "3000"
-      entrypoint: "/bin/sh"
-      command: "-c \"npm install -g serve && npm ci --only=production && npm run build && serve -s dist -p 3000\""
