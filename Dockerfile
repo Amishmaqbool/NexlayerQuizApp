@@ -34,7 +34,7 @@ WORKDIR /app
 COPY --from=builder /app/dist ./dist
 
 # Create a simple server script to serve the app
-RUN echo '#!/bin/sh\nexec serve -s dist -l 3000' > start.sh && chmod +x start.sh
+RUN echo '#!/bin/sh\nexec serve -s dist -l 3000' > /app/start.sh && chmod +x /app/start.sh
 
 # Expose port 3000
 EXPOSE 3000
