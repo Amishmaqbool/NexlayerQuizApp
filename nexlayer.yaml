@@ -7,8 +7,8 @@ application:
       servicePorts: [3000]
       vars:
         NODE_ENV: "production"
-        VITE_SUPABASE_URL: "<% URL %>"
-        VITE_SUPABASE_ANON_KEY: "your-supabase-anon-key"
+        VITE_SUPABASE_URL: "https://akvosefdzorjkekcjdkf.supabase.co"
+        VITE_SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFrdm9zZWZkem9yamtla2NqZGtmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTg3Mzc0NTMsImV4cCI6MjA3NDMxMzQ1M30.b82SKHUy1InN0ZB6XqHeFe9LbDk6fpu7qKPfrEIoLT0"
         PORT: "3000"
       entrypoint: "/bin/sh"
-      command: "-c \"npm install -g serve && npm ci --only=production && npm run build && serve -s dist -p 3000\""
+      command: "-c \"apk add --no-cache git && npm install -g serve && npm cache clean --force && npm ci --only=production --no-audit --no-fund && npm run build && serve -s dist -p 3000\""
